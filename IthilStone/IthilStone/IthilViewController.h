@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 
 
-@interface IthilViewController : NSViewController <NSStreamDelegate>
+@interface IthilViewController : NSViewController <NSStreamDelegate, NSNetServiceBrowserDelegate>
 
 @property (weak) IBOutlet NSTextField *displayInfoLabel;
 

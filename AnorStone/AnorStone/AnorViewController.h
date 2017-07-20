@@ -7,8 +7,12 @@
 //
 
 #import <Cocoa/Cocoa.h>
+@import AVFoundation;
 
-@interface AnorViewController : NSViewController <NSStreamDelegate>
+
+@interface AnorViewController : NSViewController <NSStreamDelegate, NSNetServiceDelegate>
+
+@property (nonatomic, weak) IBOutlet AVPlayerView* playerView;
 
 - (void)setupInputStream:(NSInputStream*)inputStream outputStream:(NSOutputStream*)outputStream;
 

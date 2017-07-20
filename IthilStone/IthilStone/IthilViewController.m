@@ -22,7 +22,10 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
     CGSize _displaySize;
     CGDisplayStreamRef _stream;
     VTCompressionSessionRef _session;
+    NSInputStream* _inputStream;
     NSOutputStream* _outputStream;
+    NSNetServiceBrowser* _browser;
+    NSNetService* _service;
 
 }
 
@@ -39,8 +42,19 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
     [self getDisplay];
     [self updateWindowInfo];
 
-    [self setupEncodingSession];
-    [self setupDisplayStream];
+    [self setupServiceBrowser];
+}
+
+- (void)setupServiceBrowser {
+
+    _browser = [[NSNetServiceBrowser alloc] init];
+    _browser.delegate = self;
+    _browser.includesPeerToPeer = YES;
+
+    [_browser scheduleInRunLoop:[NSRunLoop currentRunLoop]
+                        forMode:NSDefaultRunLoopMode];
+    [_browser searchForServicesOfType:@"_palantiri._tcp"
+                             inDomain:@"local"];
 }
 
 - (void)setupEncodingSession {
@@ -93,24 +107,7 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
                                                                                        &flags);
                                         CVPixelBufferRelease(buffer);
                                         CFRelease(frameProperties);
-                                        //                                        OSStatus err = VTCompressionSessionEncodeFrameWithOutputHandler(_session,
-                                        //                                                                                                        buffer,
-                                        //                                                                                                        time,
-                                        //                                                                                                        kCMTimeInvalid,
-                                        //                                                                                                        frameProperties,
-                                        //                                                                                                        &flags,
-                                        //                                                                                                        ^(OSStatus status, VTEncodeInfoFlags infoFlags, CMSampleBufferRef  _Nullable sampleBuffer) {
-                                        //                                                                                                            NSLog(@"%@: sampleBuffer=%@", NSStringFromSelector(_cmd), sampleBuffer);
-                                        //                                                                                                            if(sampleBuffer == NULL) {
-                                        //                                                                                                                NSLog(@"No sample buffer: status=%ld", (long)status);
-                                        //                                                                                                                return;
-                                        //                                                                                                            }
-                                        //
-                                        //                                                                                                            // send the buffer
-                                        //                                                                                                            [self sendBuffer:sampleBuffer];
-                                        //                                                                                                        });
                                         NSLog(@"CGDisplayStreamCreate[callback]: err=%ld", (long)err);
-                                        // TODO
                                     });
     CFRelease(streamProperties);
     CFRunLoopSourceRef source = CGDisplayStreamGetRunLoopSource(_stream);
@@ -124,15 +121,16 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
     NSLog(@"%@: buffer=%p", NSStringFromSelector(_cmd), buffer);
 
     if(_outputStream == nil) {
-        NSLog(@"Opening new output stream.");
-//        CFHostRef host = CFHostCreateWithName(kCFAllocatorDefault, (CFStringRef)@"localhost");
-        CFWriteStreamRef writeStream;
-        CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, @"127.0.0.1", (UInt32)PORT_NUMBER, NULL, &writeStream);
-        _outputStream = (NSOutputStream*)CFBridgingRelease(writeStream);
-        _outputStream.delegate = self;
-        [_outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
-                                 forMode:NSRunLoopCommonModes];
-        [_outputStream open];
+//        NSLog(@"Opening new output stream.");
+//        //        CFHostRef host = CFHostCreateWithName(kCFAllocatorDefault, (CFStringRef)@"localhost");
+//        CFWriteStreamRef writeStream;
+//        CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, @"127.0.0.1", (UInt32)PORT_NUMBER, NULL, &writeStream);
+//        _outputStream = (NSOutputStream*)CFBridgingRelease(writeStream);
+//        _outputStream.delegate = self;
+//        [_outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
+//                                 forMode:NSRunLoopCommonModes];
+//        [_outputStream open];
+        return;
     }
 
     //    NSUInteger size = (NSUInteger)CMSampleBufferGetSampleSize(buffer, 0);
@@ -224,6 +222,61 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
         case NSStreamEventOpenCompleted:
             NSLog(@"NSStreamEventOpenCompleted: ");
             break;
+    }
+}
+
+- (void)netServiceBrowserWillSearch:(NSNetServiceBrowser *)browser {
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+
+}
+
+- (void)netServiceBrowser:(NSNetServiceBrowser *)browser didNotSearch:(NSDictionary<NSString *,NSNumber *> *)errorDict {
+    NSLog(@"%@: %@, error: %@", NSStringFromSelector(_cmd), browser, errorDict);
+
+}
+
+- (void)netServiceBrowserDidStopSearch:(NSNetServiceBrowser *)browser {
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+
+}
+
+- (void)netServiceBrowser:(NSNetServiceBrowser *)browser didFindDomain:(NSString *)domainString moreComing:(BOOL)moreComing {
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+
+}
+
+- (void)netServiceBrowser:(NSNetServiceBrowser *)browser didFindService:(NSNetService *)service moreComing:(BOOL)moreComing {
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+
+    _service = service;
+
+    [service getInputStream:&_inputStream outputStream:&_outputStream];
+
+    _inputStream.delegate = self;
+    _outputStream.delegate = self;
+
+    [_inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
+                            forMode:NSDefaultRunLoopMode];
+    [_outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
+                             forMode:NSDefaultRunLoopMode];
+
+    [_inputStream open];
+    [_outputStream open];
+
+    [self setupEncodingSession];
+    [self setupDisplayStream];
+}
+
+- (void)netServiceBrowser:(NSNetServiceBrowser *)browser didRemoveDomain:(NSString *)domainString moreComing:(BOOL)moreComing {
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+
+}
+
+- (void)netServiceBrowser:(NSNetServiceBrowser *)browser didRemoveService:(NSNetService *)service moreComing:(BOOL)moreComing {
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+
+    if(service == _service) {
+        _service = nil;
     }
 }
 
