@@ -13,6 +13,8 @@
 
 static NSInteger PORT_NUMBER = 11924;
 
+void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus status, VTEncodeInfoFlags infoFlags, CMSampleBufferRef sampleBuffer);
+
 @implementation IthilViewController {
 
 @private
@@ -52,9 +54,9 @@ static NSInteger PORT_NUMBER = 11924;
                                               kCMVideoCodecType_H264,
                                               NULL,
                                               sourceBufferAttrs,
-                                              NULL,
-                                              NULL,
-                                              NULL,
+                                              kCFAllocatorDefault,
+                                              handleSample,
+                                              (__bridge void*)self,
                                               &_session);
     NSLog(@"%@: err=%ld", NSStringFromSelector(_cmd), (long)err);
 }
@@ -70,6 +72,7 @@ static NSInteger PORT_NUMBER = 11924;
                                     'BGRA',
                                     streamProperties,
                                     ^(CGDisplayStreamFrameStatus status, uint64_t displayTime, IOSurfaceRef frameSurface, CGDisplayStreamUpdateRef updateRef) {
+                                        NSLog(@"CGDisplayStreamCreate[callback]: status=%ld, displayTime=%ld, frameSurface=%@, updateRef=%@", (long)status, (long)displayTime, frameSurface, updateRef);
                                         VTEncodeInfoFlags flags = 0;
                                         CFDictionaryRef frameProperties = CFBridgingRetain(@{
 
@@ -79,27 +82,37 @@ static NSInteger PORT_NUMBER = 11924;
                                                                                        frameSurface,
                                                                                        NULL,
                                                                                        &buffer);
-                                        NSLog(@"%@: rc=%ld", NSStringFromSelector(_cmd), (long)rc);
+                                        NSLog(@"CGDisplayStreamCreate[callback]: rc=%ld, buffer=%p", (long)rc, buffer);
                                         CMTime time = CMTimeMake(displayTime, 1);
-                                        OSStatus err = VTCompressionSessionEncodeFrameWithOutputHandler(_session,
-                                                                                                        buffer,
-                                                                                                        time,
-                                                                                                        kCMTimeInvalid,
-                                                                                                        frameProperties,
-                                                                                                        &flags,
-                                                                                                        ^(OSStatus status, VTEncodeInfoFlags infoFlags, CMSampleBufferRef  _Nullable sampleBuffer) {
-                                                                                                            NSLog(@"%@: sampleBuffer=%@", NSStringFromSelector(_cmd), sampleBuffer);
-                                                                                                            if(sampleBuffer == NULL) {
-                                                                                                                NSLog(@"No sample buffer: status=%ld", (long)status);
-                                                                                                                return;
-                                                                                                            }
-
-                                                                                                            // send the buffer
-                                                                                                            [self sendBuffer:sampleBuffer];
-                                                                                                        });
-                                        NSLog(@"%@: err=%ld", NSStringFromSelector(_cmd), (long)err);
+                                        OSStatus err = VTCompressionSessionEncodeFrame(_session,
+                                                                                       buffer,
+                                                                                       time,
+                                                                                       kCMTimeInvalid,
+                                                                                       frameProperties,
+                                                                                       (__bridge void*)self,
+                                                                                       &flags);
+                                        CVPixelBufferRelease(buffer);
+                                        CFRelease(frameProperties);
+                                        //                                        OSStatus err = VTCompressionSessionEncodeFrameWithOutputHandler(_session,
+                                        //                                                                                                        buffer,
+                                        //                                                                                                        time,
+                                        //                                                                                                        kCMTimeInvalid,
+                                        //                                                                                                        frameProperties,
+                                        //                                                                                                        &flags,
+                                        //                                                                                                        ^(OSStatus status, VTEncodeInfoFlags infoFlags, CMSampleBufferRef  _Nullable sampleBuffer) {
+                                        //                                                                                                            NSLog(@"%@: sampleBuffer=%@", NSStringFromSelector(_cmd), sampleBuffer);
+                                        //                                                                                                            if(sampleBuffer == NULL) {
+                                        //                                                                                                                NSLog(@"No sample buffer: status=%ld", (long)status);
+                                        //                                                                                                                return;
+                                        //                                                                                                            }
+                                        //
+                                        //                                                                                                            // send the buffer
+                                        //                                                                                                            [self sendBuffer:sampleBuffer];
+                                        //                                                                                                        });
+                                        NSLog(@"CGDisplayStreamCreate[callback]: err=%ld", (long)err);
                                         // TODO
                                     });
+    CFRelease(streamProperties);
     CFRunLoopSourceRef source = CGDisplayStreamGetRunLoopSource(_stream);
     CFRunLoopRef runLoop = CFRunLoopGetCurrent();
     CFRunLoopAddSource(runLoop, source, kCFRunLoopCommonModes);
@@ -108,13 +121,18 @@ static NSInteger PORT_NUMBER = 11924;
 }
 
 - (void)sendBuffer:(CMSampleBufferRef)buffer {
-    NSLog(@"%@: buffer=%@", NSStringFromSelector(_cmd), buffer);
+    NSLog(@"%@: buffer=%p", NSStringFromSelector(_cmd), buffer);
 
     if(_outputStream == nil) {
-        CFHostRef host = CFHostCreateWithName(kCFAllocatorDefault, (CFStringRef)@"localhost");
+        NSLog(@"Opening new output stream.");
+//        CFHostRef host = CFHostCreateWithName(kCFAllocatorDefault, (CFStringRef)@"localhost");
         CFWriteStreamRef writeStream;
-        CFStreamCreatePairWithSocketToCFHost(kCFAllocatorDefault, host, (UInt32)PORT_NUMBER, NULL, &writeStream);
+        CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, @"127.0.0.1", (UInt32)PORT_NUMBER, NULL, &writeStream);
         _outputStream = (NSOutputStream*)CFBridgingRelease(writeStream);
+        _outputStream.delegate = self;
+        [_outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop]
+                                 forMode:NSRunLoopCommonModes];
+        [_outputStream open];
     }
 
     //    NSUInteger size = (NSUInteger)CMSampleBufferGetSampleSize(buffer, 0);
@@ -122,7 +140,22 @@ static NSInteger PORT_NUMBER = 11924;
     size_t totalLength = 0;
     char* dataPointer;
     CMBlockBufferGetDataPointer(b, 0, NULL, &totalLength, &dataPointer);
-    [_outputStream write:(const uint8_t*)dataPointer maxLength:totalLength];
+    NSUInteger length = [_outputStream write:(const uint8_t*)dataPointer maxLength:totalLength];
+    NSLog(@"length=%ld", (long)length);
+
+    switch(length) {
+        case -1:
+            NSLog(@"Error while writing stream: %@", [_outputStream streamError]);
+            break;
+
+        case 0:
+            NSLog(@"Nothing sent.");
+            break;
+
+        default:
+            NSLog(@"%ld bytes sent.", length);
+            break;
+    }
 }
 
 - (void)handleWindowMove:(NSNotification*)note {
@@ -164,4 +197,48 @@ static NSInteger PORT_NUMBER = 11924;
     [_displayInfoLabel setStringValue:info];
 }
 
+- (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode {
+    NSLog(@"%@: %@, %ld", NSStringFromSelector(_cmd), stream, eventCode);
+
+    switch(eventCode) {
+        case NSStreamEventNone:
+            NSLog(@"NSStreamEventNone: ");
+            break;
+
+        case NSStreamEventEndEncountered:
+            NSLog(@"NSStreamEventEndEncountered: ");
+            break;
+
+        case NSStreamEventErrorOccurred:
+            NSLog(@"NSStreamEventErrorOccurred: ");
+            break;
+
+        case NSStreamEventHasBytesAvailable:
+            NSLog(@"NSStreamEventHasBytesAvailable: ");
+            break;
+
+        case NSStreamEventHasSpaceAvailable:
+            NSLog(@"NSStreamEventHasSpaceAvailable: ");
+            break;
+
+        case NSStreamEventOpenCompleted:
+            NSLog(@"NSStreamEventOpenCompleted: ");
+            break;
+    }
+}
+
 @end
+
+
+void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus status, VTEncodeInfoFlags infoFlags, CMSampleBufferRef sampleBuffer) {
+    NSLog(@"handleSample: outputCallbackRefCon=%@, sourceFrameRefCon=%@, status=%ld, infoFlags=%ld, sampleBuffer=%p", outputCallbackRefCon, sourceFrameRefCon, (long)status, (long)infoFlags, sampleBuffer);
+    if(sampleBuffer == NULL) {
+        NSLog(@"No sample buffer: status=%ld", (long)status);
+        return;
+    }
+
+    // send the buffer
+    IthilViewController* vc = (__bridge IthilViewController*)outputCallbackRefCon;
+    [vc sendBuffer:sampleBuffer];
+}
+

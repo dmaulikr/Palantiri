@@ -10,7 +10,7 @@
 
 @interface AnorViewController : NSViewController <NSStreamDelegate>
 
-@property (nonatomic, retain) NSInputStream* inputStream;
+- (void)setupInputStream:(NSInputStream*)inputStream outputStream:(NSOutputStream*)outputStream;
 
 @end
 
