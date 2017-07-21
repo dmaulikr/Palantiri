@@ -11,7 +11,7 @@
 @import VideoToolbox;
 
 
-static NSInteger PORT_NUMBER = 11924;
+//static NSInteger PORT_NUMBER = 11924;
 static NSInteger BUFFER_SIZE = 1024;
 
 
@@ -43,6 +43,24 @@ void decodeFrame(void *decompressionOutputRefCon,
 
     _data = [NSMutableData new];
 
+    self.videoLayer = [[AVSampleBufferDisplayLayer alloc] init];
+    self.videoLayer.bounds = self.view.bounds;
+    self.videoLayer.position = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds));
+    self.videoLayer.videoGravity = AVLayerVideoGravityResizeAspect;
+    self.videoLayer.backgroundColor = [[NSColor greenColor] CGColor];
+
+    //set Timebase
+    CMTimebaseRef controlTimebase;
+    CMTimebaseCreateWithMasterClock( CFAllocatorGetDefault(), CMClockGetHostTimeClock(), &controlTimebase );
+
+    self.videoLayer.controlTimebase = controlTimebase;
+    CMTimebaseSetTime(self.videoLayer.controlTimebase, CMTimeMake(5, 1));
+    CMTimebaseSetRate(self.videoLayer.controlTimebase, 1.0);
+
+    // connecting the videolayer with the view
+
+    [self.view.layer addSublayer:_videoLayer];
+    
     [self setupListener];
 }
 
@@ -250,6 +268,9 @@ void decodeFrame(void *decompressionOutputRefCon,
     NSLog(@"err=%ld", (long)err);
 
     // TODO: put it on the screen
+    if ([_videoLayer isReadyForMoreMediaData]) {
+        [_videoLayer enqueueSampleBuffer:buffer];
+    }
 }
 
 - (void)netServiceDidStop:(NSNetService *)sender {

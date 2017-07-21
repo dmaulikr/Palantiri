@@ -12,9 +12,7 @@
 
 @interface AnorViewController : NSViewController <NSStreamDelegate, NSNetServiceDelegate>
 
-@property (nonatomic, weak) IBOutlet AVPlayerView* playerView;
-
-- (void)setupInputStream:(NSInputStream*)inputStream outputStream:(NSOutputStream*)outputStream;
+@property (nonatomic, retain) AVSampleBufferDisplayLayer *videoLayer;
 
 @end
 
