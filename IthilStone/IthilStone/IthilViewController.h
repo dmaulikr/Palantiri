@@ -11,7 +11,5 @@
 
 @interface IthilViewController : NSViewController <NSStreamDelegate, NSNetServiceBrowserDelegate>
 
-@property (weak) IBOutlet NSTextField *displayInfoLabel;
-
 @end
 
