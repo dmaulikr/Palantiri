@@ -61,7 +61,7 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
 
     // setup encoding session
     CFDictionaryRef sourceBufferAttrs = CFBridgingRetain(@{
-                                                           (id)kVTCompressionPropertyKey_RealTime : @YES,
+//                                                           (id)kVTCompressionPropertyKey_RealTime : @YES,
                                                            });
     OSStatus err = VTCompressionSessionCreate(kCFAllocatorDefault,
                                               _displaySize.width, _displaySize.height,
@@ -89,23 +89,24 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
                                         NSLog(@"CGDisplayStreamCreate[callback]: status=%ld, displayTime=%ld, frameSurface=%@, updateRef=%@", (long)status, (long)displayTime, frameSurface, updateRef);
                                         VTEncodeInfoFlags flags = 0;
                                         CFDictionaryRef frameProperties = CFBridgingRetain(@{
-
+                                                                                             (id)kVTCompressionPropertyKey_RealTime : @YES,
                                                                                              });
-                                        CVPixelBufferRef buffer;
+                                        CVPixelBufferRef pixelBuffer;
                                         CVReturn rc = CVPixelBufferCreateWithIOSurface(kCFAllocatorDefault,
                                                                                        frameSurface,
                                                                                        NULL,
-                                                                                       &buffer);
-                                        NSLog(@"CGDisplayStreamCreate[callback]: rc=%ld, buffer=%p", (long)rc, buffer);
+                                                                                       &pixelBuffer);
+                                        NSLog(@"CGDisplayStreamCreate[callback]: rc=%ld, pixelBuffer=%p", (long)rc, pixelBuffer);
                                         CMTime time = CMTimeMake(displayTime, 1);
                                         OSStatus err = VTCompressionSessionEncodeFrame(_session,
-                                                                                       buffer,
+                                                                                       pixelBuffer,
                                                                                        time,
                                                                                        kCMTimeInvalid,
                                                                                        frameProperties,
                                                                                        (__bridge void*)self,
                                                                                        &flags);
-                                        CVPixelBufferRelease(buffer);
+//                                        VTCompressionSessionEndPass(_session, NULL, NULL);
+                                        CVPixelBufferRelease(pixelBuffer);
                                         CFRelease(frameProperties);
                                         NSLog(@"CGDisplayStreamCreate[callback]: err=%ld", (long)err);
                                     });
@@ -133,12 +134,91 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
         return;
     }
 
+    NSMutableData* elementaryStream = [NSMutableData new];
+
+    BOOL isIFrame = YES;
+//    CFArrayRef attachmentsArray = CMSampleBufferGetSampleAttachmentsArray(buffer, 0);
+//    if(CFArrayGetCount(attachmentsArray)) {
+//        CFBooleanRef notSync;
+//        CFDictionaryRef dict = CFArrayGetValueAtIndex(attachmentsArray, 0);
+//        BOOL keyExists = CFDictionaryGetValueIfPresent(dict,
+//                                                       kCMSampleAttachmentKey_NotSync,
+//                                                       (const void **)&notSync);
+//        // An I-Frame is a sync frame
+//        isIFrame = !keyExists || !CFBooleanGetValue(notSync);
+//    }
+
+    static const size_t startCodeLength = 4;
+    static const uint8_t startCode[] = { 0x00, 0x00, 0x00, 0x01 };
+
+    if(isIFrame) {
+        CMFormatDescriptionRef description = CMSampleBufferGetFormatDescription(buffer);
+
+        // Find out how many parameter sets there are
+        size_t numberOfParameterSets;
+        CMVideoFormatDescriptionGetH264ParameterSetAtIndex(description,
+                                                           0,
+                                                           NULL,
+                                                           NULL,
+                                                           &numberOfParameterSets,
+                                                           NULL);
+
+        // Write each parameter set to the elementary stream
+        for (int i = 0; i < numberOfParameterSets; i++) {
+            const uint8_t *parameterSetPointer;
+            size_t parameterSetLength;
+            CMVideoFormatDescriptionGetH264ParameterSetAtIndex(description,
+                                                               i,
+                                                               &parameterSetPointer,
+                                                               &parameterSetLength,
+                                                               NULL, NULL);
+
+            // Write the parameter set to the elementary stream
+            [elementaryStream appendBytes:startCode length:startCodeLength];
+            [elementaryStream appendBytes:parameterSetPointer length:parameterSetLength];
+        }
+    }
+
+    size_t blockBufferLength;
+    uint8_t* bufferDataPointer = NULL;
+    CMBlockBufferRef dataBuffer = CMSampleBufferGetDataBuffer(buffer);
+    CMBlockBufferGetDataPointer(dataBuffer,
+                                0,
+                                NULL,
+                                &blockBufferLength,
+                                (char**)&bufferDataPointer);
+
+    // Loop through all the NAL units in the block buffer
+    // and write them to the elementary stream with
+    // start codes instead of AVCC length headers
+    size_t bufferOffset = 0;
+    static const int AVCCHeaderLength = 4;
+    while(bufferOffset < blockBufferLength - AVCCHeaderLength) {
+        // Read the NAL unit length
+        uint32_t NALUnitLength = 0;
+        memcpy(&NALUnitLength, bufferDataPointer + bufferOffset, AVCCHeaderLength);
+        // Convert the length value from Big-endian to Little-endian
+        NALUnitLength = CFSwapInt32BigToHost(NALUnitLength);
+        // Write start code to the elementary stream
+        [elementaryStream appendBytes:startCode
+                               length:startCodeLength];
+        // Write the NAL unit without the AVCC length header to the elementary stream
+//        uint8_t naluType = *((uint8_t*)(bufferDataPointer + bufferOffset + AVCCHeaderLength));
+//        NSLog(@"naluType=%d", naluType);
+//        uint8_t type = 5;
+//        [elementaryStream appendBytes:&type length:1];
+        [elementaryStream appendBytes:bufferDataPointer + bufferOffset + AVCCHeaderLength
+                               length:NALUnitLength];
+        // Move to the next NAL unit in the block buffer
+        bufferOffset += AVCCHeaderLength + NALUnitLength;
+    }
+
     //    NSUInteger size = (NSUInteger)CMSampleBufferGetSampleSize(buffer, 0);
-    CMBlockBufferRef b = CMSampleBufferGetDataBuffer(buffer);
-    size_t totalLength = 0;
-    char* dataPointer;
-    CMBlockBufferGetDataPointer(b, 0, NULL, &totalLength, &dataPointer);
-    NSUInteger length = [_outputStream write:(const uint8_t*)dataPointer maxLength:totalLength];
+//    CMBlockBufferRef b = CMSampleBufferGetDataBuffer(buffer);
+//    size_t totalLength = 0;
+//    char* dataPointer;
+//    CMBlockBufferGetDataPointer(b, 0, NULL, &totalLength, &dataPointer);
+    NSUInteger length = [_outputStream write:(const uint8_t*)[elementaryStream bytes] maxLength:[elementaryStream length]];
     NSLog(@"length=%ld", (long)length);
 
     switch(length) {
@@ -157,8 +237,24 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
 }
 
 - (void)handleWindowMove:(NSNotification*)note {
+    CGDirectDisplayID oldDisplayId = _displayId;
+
     [self getDisplay];
     [self updateWindowInfo];
+
+    if(_displayId != oldDisplayId) {
+        NSLog(@"Display ID has changed; need to setup display stream.");
+
+        if(_stream) {
+            NSLog(@"Tearing down old display stream.");
+            CGDisplayStreamStop(_stream);
+            CFRelease(_stream);
+            _stream = NULL;
+        }
+
+        NSLog(@"Setting up display stream for display ID %ld.", (long)_displayId);
+        [self setupDisplayStream];
+    }
 }
 
 - (void)getDisplay {
