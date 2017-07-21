@@ -679,7 +679,7 @@
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="0.0"/>
+            <point key="canvasLocation" x="7" y="-333"/>
         </scene>
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
@@ -708,25 +708,11 @@
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <subviews>
-                            <customView wantsLayer="YES" translatesAutoresizingMaskIntoConstraints="NO" id="feV-Sd-gGB">
-                                <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
-                            </customView>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="feV-Sd-gGB" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="M0J-v4-7cL"/>
-                            <constraint firstAttribute="bottom" secondItem="feV-Sd-gGB" secondAttribute="bottom" id="WIF-04-xG9"/>
-                            <constraint firstAttribute="trailing" secondItem="feV-Sd-gGB" secondAttribute="trailing" id="iJc-Db-EAb"/>
-                            <constraint firstItem="feV-Sd-gGB" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="shz-q8-eAB"/>
-                        </constraints>
                     </view>
-                    <connections>
-                        <outlet property="containerView" destination="feV-Sd-gGB" id="6W7-en-K9m"/>
-                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="655"/>
+            <point key="canvasLocation" x="75" y="907"/>
         </scene>
     </scenes>
 </document>

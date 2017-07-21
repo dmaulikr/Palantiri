@@ -12,7 +12,10 @@
 
 @interface AnorViewController : NSViewController <NSStreamDelegate, NSNetServiceDelegate>
 
-@property (nonatomic, weak) IBOutlet NSView* containerView;
+//@property (nonatomic, weak) IBOutlet NSView* containerView;
+//@property (nonatomic, weak) IBOutlet NSOpenGLView* glView;
+//@property (nonatomic, weak) IBOutlet NSImageView* imageView;
+
 @property (nonatomic, retain) AVSampleBufferDisplayLayer *videoLayer;
 
 @end
