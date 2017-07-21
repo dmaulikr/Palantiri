@@ -86,7 +86,7 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
                                     'BGRA',
                                     streamProperties,
                                     ^(CGDisplayStreamFrameStatus status, uint64_t displayTime, IOSurfaceRef frameSurface, CGDisplayStreamUpdateRef updateRef) {
-                                        NSLog(@"CGDisplayStreamCreate[callback]: status=%ld, displayTime=%ld, frameSurface=%@, updateRef=%@", (long)status, (long)displayTime, frameSurface, updateRef);
+//                                        NSLog(@"CGDisplayStreamCreate[callback]: status=%ld, displayTime=%ld, frameSurface=%@, updateRef=%@", (long)status, (long)displayTime, frameSurface, updateRef);
                                         VTEncodeInfoFlags flags = 0;
                                         CFDictionaryRef frameProperties = CFBridgingRetain(@{
                                                                                              (id)kVTCompressionPropertyKey_RealTime : @YES,
@@ -96,7 +96,7 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
                                                                                        frameSurface,
                                                                                        NULL,
                                                                                        &pixelBuffer);
-                                        NSLog(@"CGDisplayStreamCreate[callback]: rc=%ld, pixelBuffer=%p", (long)rc, pixelBuffer);
+//                                        NSLog(@"CGDisplayStreamCreate[callback]: rc=%ld, pixelBuffer=%p", (long)rc, pixelBuffer);
                                         CMTime time = CMTimeMake(displayTime, 1);
                                         OSStatus err = VTCompressionSessionEncodeFrame(_session,
                                                                                        pixelBuffer,
@@ -108,7 +108,7 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
 //                                        VTCompressionSessionEndPass(_session, NULL, NULL);
                                         CVPixelBufferRelease(pixelBuffer);
                                         CFRelease(frameProperties);
-                                        NSLog(@"CGDisplayStreamCreate[callback]: err=%ld", (long)err);
+//                                        NSLog(@"CGDisplayStreamCreate[callback]: err=%ld", (long)err);
                                     });
     CFRelease(streamProperties);
     CFRunLoopSourceRef source = CGDisplayStreamGetRunLoopSource(_stream);
@@ -119,7 +119,7 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
 }
 
 - (void)sendBuffer:(CMSampleBufferRef)buffer {
-    NSLog(@"%@: buffer=%p", NSStringFromSelector(_cmd), buffer);
+//    NSLog(@"%@: buffer=%p", NSStringFromSelector(_cmd), buffer);
 
     if(_outputStream == nil) {
 //        NSLog(@"Opening new output stream.");
@@ -219,7 +219,7 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
 //    char* dataPointer;
 //    CMBlockBufferGetDataPointer(b, 0, NULL, &totalLength, &dataPointer);
     NSUInteger length = [_outputStream write:(const uint8_t*)[elementaryStream bytes] maxLength:[elementaryStream length]];
-    NSLog(@"length=%ld", (long)length);
+//    NSLog(@"length=%ld", (long)length);
 
     switch(length) {
         case -1:
@@ -227,11 +227,11 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
             break;
 
         case 0:
-            NSLog(@"Nothing sent.");
+//            NSLog(@"Nothing sent.");
             break;
 
         default:
-            NSLog(@"%ld bytes sent.", length);
+//            NSLog(@"%ld bytes sent.", length);
             break;
     }
 }
@@ -292,57 +292,57 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
 }
 
 - (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode {
-    NSLog(@"%@: %@, %ld", NSStringFromSelector(_cmd), stream, eventCode);
+//    NSLog(@"%@: %@, %ld", NSStringFromSelector(_cmd), stream, eventCode);
 
     switch(eventCode) {
         case NSStreamEventNone:
-            NSLog(@"NSStreamEventNone: ");
+//            NSLog(@"NSStreamEventNone: ");
             break;
 
         case NSStreamEventEndEncountered:
-            NSLog(@"NSStreamEventEndEncountered: ");
+//            NSLog(@"NSStreamEventEndEncountered: ");
             break;
 
         case NSStreamEventErrorOccurred:
-            NSLog(@"NSStreamEventErrorOccurred: ");
+            NSLog(@"NSStreamEventErrorOccurred: %@", [stream streamError]);
             break;
 
         case NSStreamEventHasBytesAvailable:
-            NSLog(@"NSStreamEventHasBytesAvailable: ");
+//            NSLog(@"NSStreamEventHasBytesAvailable: ");
             break;
 
         case NSStreamEventHasSpaceAvailable:
-            NSLog(@"NSStreamEventHasSpaceAvailable: ");
+//            NSLog(@"NSStreamEventHasSpaceAvailable: ");
             break;
 
         case NSStreamEventOpenCompleted:
-            NSLog(@"NSStreamEventOpenCompleted: ");
+//            NSLog(@"NSStreamEventOpenCompleted: ");
             break;
     }
 }
 
 - (void)netServiceBrowserWillSearch:(NSNetServiceBrowser *)browser {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
 
 }
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser didNotSearch:(NSDictionary<NSString *,NSNumber *> *)errorDict {
-    NSLog(@"%@: %@, error: %@", NSStringFromSelector(_cmd), browser, errorDict);
+//    NSLog(@"%@: %@, error: %@", NSStringFromSelector(_cmd), browser, errorDict);
 
 }
 
 - (void)netServiceBrowserDidStopSearch:(NSNetServiceBrowser *)browser {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
 
 }
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser didFindDomain:(NSString *)domainString moreComing:(BOOL)moreComing {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
 
 }
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser didFindService:(NSNetService *)service moreComing:(BOOL)moreComing {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
 
     _service = service;
 
@@ -364,12 +364,12 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
 }
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser didRemoveDomain:(NSString *)domainString moreComing:(BOOL)moreComing {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
 
 }
 
 - (void)netServiceBrowser:(NSNetServiceBrowser *)browser didRemoveService:(NSNetService *)service moreComing:(BOOL)moreComing {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), browser);
 
     if(service == _service) {
         _service = nil;
@@ -380,7 +380,7 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
 
 
 void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus status, VTEncodeInfoFlags infoFlags, CMSampleBufferRef sampleBuffer) {
-    NSLog(@"handleSample: outputCallbackRefCon=%@, sourceFrameRefCon=%@, status=%ld, infoFlags=%ld, sampleBuffer=%p", outputCallbackRefCon, sourceFrameRefCon, (long)status, (long)infoFlags, sampleBuffer);
+//    NSLog(@"handleSample: outputCallbackRefCon=%@, sourceFrameRefCon=%@, status=%ld, infoFlags=%ld, sampleBuffer=%p", outputCallbackRefCon, sourceFrameRefCon, (long)status, (long)infoFlags, sampleBuffer);
     if(sampleBuffer == NULL) {
         NSLog(@"No sample buffer: status=%ld", (long)status);
         return;
