@@ -44,24 +44,28 @@ void decodeFrame(void *decompressionOutputRefCon,
     _data = [NSMutableData new];
 
     self.videoLayer = [[AVSampleBufferDisplayLayer alloc] init];
-    self.videoLayer.bounds = self.view.bounds;
+    self.videoLayer.frame = self.view.bounds;
     self.videoLayer.position = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds));
     self.videoLayer.videoGravity = AVLayerVideoGravityResizeAspect;
     self.videoLayer.backgroundColor = [[NSColor greenColor] CGColor];
 
-    //set Timebase
     CMTimebaseRef controlTimebase;
-    CMTimebaseCreateWithMasterClock( CFAllocatorGetDefault(), CMClockGetHostTimeClock(), &controlTimebase );
+    CMTimebaseCreateWithMasterClock(CFAllocatorGetDefault(), CMClockGetHostTimeClock(), &controlTimebase);
 
     self.videoLayer.controlTimebase = controlTimebase;
     CMTimebaseSetTime(self.videoLayer.controlTimebase, CMTimeMake(5, 1));
     CMTimebaseSetRate(self.videoLayer.controlTimebase, 1.0);
 
-    // connecting the videolayer with the view
-
-    [self.view.layer addSublayer:_videoLayer];
+    // connect the video layer with the view
+    [_containerView.layer addSublayer:_videoLayer];
     
     [self setupListener];
+}
+
+- (void)viewDidLayout {
+    [super viewDidLayout];
+
+self.videoLayer.frame = _containerView.bounds;
 }
 
 - (void)setupListener {
@@ -93,7 +97,7 @@ void decodeFrame(void *decompressionOutputRefCon,
                                                    bufferAttrs,
                                                    &callBackRecord,
                                                 &_session);
-    NSLog(@"%@: err=%ld", NSStringFromSelector(_cmd), (long)err);
+//    NSLog(@"%@: err=%ld", NSStringFromSelector(_cmd), (long)err);
 }
 
 - (int)findStartCodeInData:(NSData*)data startingFromOffset:(int)offset {
@@ -207,7 +211,7 @@ void decodeFrame(void *decompressionOutputRefCon,
                                                                           4,
                                                                           &_formatDesc);
 
-    NSLog(@"Creation of CMVideoFormatDescription: %@", (status == noErr) ? @"successful!" : @"failed...");
+//    NSLog(@"Creation of CMVideoFormatDescription: %@", (status == noErr) ? @"successful!" : @"failed...");
     if(status != noErr) {
         NSLog(@"Format Description ERROR type: %d", (int)status);
     }
@@ -265,7 +269,7 @@ void decodeFrame(void *decompressionOutputRefCon,
                                       frameFlags,
                                       (void*)CFBridgingRetain(now),
                                       &decodeFlags);
-    NSLog(@"err=%ld", (long)err);
+//    NSLog(@"err=%ld", (long)err);
 
     // TODO: put it on the screen
     if ([_videoLayer isReadyForMoreMediaData]) {
@@ -274,27 +278,27 @@ void decodeFrame(void *decompressionOutputRefCon,
 }
 
 - (void)netServiceDidStop:(NSNetService *)sender {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
 
 }
 
 - (void)netServiceDidPublish:(NSNetService *)sender {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
 
 }
 
 - (void)netServiceWillPublish:(NSNetService *)sender {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
 
 }
 
 - (void)netServiceWillResolve:(NSNetService *)sender {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
 
 }
 
 - (void)netService:(NSNetService *)sender didNotPublish:(NSDictionary<NSString *,NSNumber *> *)errorDict {
-    NSLog(@"%@: %@, error: %@", NSStringFromSelector(_cmd), sender, errorDict);
+//    NSLog(@"%@: %@, error: %@", NSStringFromSelector(_cmd), sender, errorDict);
 
 }
 
@@ -304,12 +308,12 @@ void decodeFrame(void *decompressionOutputRefCon,
 }
 
 - (void)netServiceDidResolveAddress:(NSNetService *)sender {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
 
 }
 
 - (void)netService:(NSNetService *)sender didAcceptConnectionWithInputStream:(NSInputStream *)inputStream outputStream:(NSOutputStream *)outputStream {
-    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
+//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
 
     [self setupDecodingSession];
 
@@ -328,17 +332,17 @@ void decodeFrame(void *decompressionOutputRefCon,
 }
 
 - (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode {
-    NSLog(@"%@: %@, %ld", NSStringFromSelector(_cmd), stream, eventCode);
+//    NSLog(@"%@: %@, %ld", NSStringFromSelector(_cmd), stream, eventCode);
 
     uint8_t buffer[BUFFER_SIZE];
 
     switch(eventCode) {
         case NSStreamEventNone:
-            NSLog(@"NSStreamEventNone: ");
+//            NSLog(@"NSStreamEventNone: ");
             break;
 
         case NSStreamEventEndEncountered:
-            NSLog(@"NSStreamEventEndEncountered: ");
+//            NSLog(@"NSStreamEventEndEncountered: ");
             break;
 
         case NSStreamEventErrorOccurred:
@@ -346,11 +350,11 @@ void decodeFrame(void *decompressionOutputRefCon,
             break;
 
         case NSStreamEventHasBytesAvailable:
-            NSLog(@"NSStreamEventHasBytesAvailable: %ld", [stream streamStatus]);
+//            NSLog(@"NSStreamEventHasBytesAvailable: %ld", [stream streamStatus]);
 
             while([(NSInputStream*)stream hasBytesAvailable]) {
                 NSUInteger length = [(NSInputStream*)stream read:buffer maxLength:BUFFER_SIZE];
-                NSLog(@"length=%ld", length);
+//                NSLog(@"length=%ld", length);
 
                 switch(length) {
                     case -1:
@@ -379,11 +383,11 @@ void decodeFrame(void *decompressionOutputRefCon,
             break;
 
         case NSStreamEventHasSpaceAvailable:
-            NSLog(@"NSStreamEventHasSpaceAvailable: ");
+//            NSLog(@"NSStreamEventHasSpaceAvailable: ");
             break;
 
         case NSStreamEventOpenCompleted:
-            NSLog(@"NSStreamEventOpenCompleted: %ld", [stream streamStatus]);
+//            NSLog(@"NSStreamEventOpenCompleted: %ld", [stream streamStatus]);
             break;
     }
 }
