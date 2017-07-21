@@ -283,7 +283,7 @@ self.videoLayer.frame = _containerView.bounds;
 }
 
 - (void)netServiceDidPublish:(NSNetService *)sender {
-//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
 
 }
 
@@ -313,7 +313,7 @@ self.videoLayer.frame = _containerView.bounds;
 }
 
 - (void)netService:(NSNetService *)sender didAcceptConnectionWithInputStream:(NSInputStream *)inputStream outputStream:(NSOutputStream *)outputStream {
-//    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
+    NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
 
     [self setupDecodingSession];
 
