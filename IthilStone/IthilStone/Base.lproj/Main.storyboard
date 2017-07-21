@@ -684,8 +684,9 @@
         <!--Window Controller-->
         <scene sceneID="R2V-B0-nI4">
             <objects>
+                <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="Capturer" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="270"/>
@@ -698,29 +699,21 @@
                         <segue destination="XfG-lQ-9wD" kind="relationship" relationship="window.shadowedContentViewController" id="cq2-FE-JQM"/>
                     </connections>
                 </windowController>
-                <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="75" y="250"/>
         </scene>
         <!--Ithil View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
+                <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <viewController id="XfG-lQ-9wD" customClass="IthilViewController" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="535" height="89"/>
+                        <rect key="frame" x="0.0" y="0.0" width="535" height="64"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Mvd-hQ-O8H">
-                                <rect key="frame" x="18" y="20" width="499" height="17"/>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Getting display..." id="DpI-Be-9UQ">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hth-tv-weS">
-                                <rect key="frame" x="18" y="45" width="499" height="24"/>
-                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Drag this window to the display you want to capture." id="nNw-9g-zns">
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D8a-sn-Tjq">
+                                <rect key="frame" x="18" y="20" width="499" height="24"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Capturing main display..." id="vrg-Xh-TvP">
                                     <font key="font" metaFont="systemBold" size="20"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -728,20 +721,13 @@
                             </textField>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="hth-tv-weS" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="2Up-i7-6u4"/>
-                            <constraint firstItem="Mvd-hQ-O8H" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="4Y3-XT-kxx"/>
-                            <constraint firstItem="Mvd-hQ-O8H" firstAttribute="top" secondItem="hth-tv-weS" secondAttribute="bottom" constant="8" symbolic="YES" id="G8X-nM-ZL3"/>
-                            <constraint firstAttribute="trailing" secondItem="Mvd-hQ-O8H" secondAttribute="trailing" constant="20" symbolic="YES" id="Tda-Nu-dz7"/>
-                            <constraint firstAttribute="trailing" secondItem="hth-tv-weS" secondAttribute="trailing" constant="20" symbolic="YES" id="cdf-zZ-gbZ"/>
-                            <constraint firstItem="hth-tv-weS" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" symbolic="YES" id="edO-rs-hcE"/>
-                            <constraint firstAttribute="bottom" secondItem="Mvd-hQ-O8H" secondAttribute="bottom" constant="20" symbolic="YES" id="u9r-zj-OEC"/>
+                            <constraint firstItem="D8a-sn-Tjq" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="20" symbolic="YES" id="8ou-GT-s2g"/>
+                            <constraint firstAttribute="bottom" secondItem="D8a-sn-Tjq" secondAttribute="bottom" constant="20" symbolic="YES" id="D2e-Gw-iqt"/>
+                            <constraint firstItem="D8a-sn-Tjq" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="20" symbolic="YES" id="a3h-3Z-8Q9"/>
+                            <constraint firstAttribute="trailing" secondItem="D8a-sn-Tjq" secondAttribute="trailing" constant="20" symbolic="YES" id="q8n-l1-C6P"/>
                         </constraints>
                     </view>
-                    <connections>
-                        <outlet property="displayInfoLabel" destination="Mvd-hQ-O8H" id="qa0-kx-vKN"/>
-                    </connections>
                 </viewController>
-                <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="75" y="655"/>
         </scene>
