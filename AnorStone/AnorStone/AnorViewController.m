@@ -44,32 +44,10 @@ void decodeFrame(void *decompressionOutputRefCon,
 
     _data = [NSMutableData new];
 
-//        self.videoLayer = [[AVSampleBufferDisplayLayer alloc] init];
-//        self.videoLayer.frame = self.view.bounds;
-//        self.videoLayer.position = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds));
-//        self.videoLayer.videoGravity = AVLayerVideoGravityResizeAspect;
-//        self.videoLayer.backgroundColor = [[NSColor greenColor] CGColor];
-//
-//        CMTimebaseRef controlTimebase;
-//        CMTimebaseCreateWithMasterClock(CFAllocatorGetDefault(), CMClockGetHostTimeClock(), &controlTimebase);
-//
-//        self.videoLayer.controlTimebase = controlTimebase;
-//        CMTimebaseSetTime(self.videoLayer.controlTimebase, CMTimeMake(5, 1));
-//        CMTimebaseSetRate(self.videoLayer.controlTimebase, 1.0);
-//
-//        // connect the video layer with the view
-//        [self.view.layer addSublayer:_videoLayer];
-
-    //    self.glView.layer.backgroundColor = [NSColor greenColor].CGColor;
-
-//    [self.glView prepareOpenGL];
-//    [self.glView clearGLContext];
-
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-
     /* Create CIContext */
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     _glView.ciContext = [CIContext contextWithCGLContext:_glView.openGLContext.CGLContextObj
-                                      pixelFormat:_glView.pixelFormat.CGLPixelFormatObj
+                                             pixelFormat:_glView.pixelFormat.CGLPixelFormatObj
                                                  options:@{
                                                            kCIContextOutputColorSpace : (__bridge id)colorSpace,
                                                            kCIContextWorkingColorSpace : (__bridge id)colorSpace,
@@ -83,7 +61,7 @@ void decodeFrame(void *decompressionOutputRefCon,
 - (void)viewDidLayout {
     [super viewDidLayout];
 
-//        self.videoLayer.frame = self.view.bounds;
+    _glView.frame = self.view.bounds;
     _glView.needsReshape = YES;
     [_glView setNeedsDisplay:YES];
 }
@@ -109,8 +87,8 @@ void decodeFrame(void *decompressionOutputRefCon,
     callBackRecord.decompressionOutputRefCon = (__bridge void *)self;
 
     CFDictionaryRef bufferAttrs = CFBridgingRetain(@{
-                                                 (id)kCVPixelBufferOpenGLCompatibilityKey : (id)kCFBooleanTrue,
-                                                 (id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA),
+                                                     (id)kCVPixelBufferOpenGLCompatibilityKey : (id)kCFBooleanTrue,
+                                                     (id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA),
                                                      });
     OSStatus err = VTDecompressionSessionCreate(kCFAllocatorDefault,
                                                 _formatDesc,
@@ -289,12 +267,7 @@ void decodeFrame(void *decompressionOutputRefCon,
                                                      frameFlags,
                                                      (void*)CFBridgingRetain(now),
                                                      &decodeFlags);
-//        NSLog(@"err=%ld", (long)err);
-
-//    // put it on the screen
-//    if ([_videoLayer isReadyForMoreMediaData]) {
-//        [_videoLayer enqueueSampleBuffer:buffer];
-//    }
+    //        NSLog(@"err=%ld", (long)err);
 }
 
 - (void)netServiceDidStop:(NSNetService *)sender {
@@ -420,41 +393,9 @@ void decodeFrame(void *decompressionOutputRefCon, void *sourceFrameRefCon, OSSta
 
     AnorViewController* vc = (__bridge AnorViewController*)decompressionOutputRefCon;
 
-//    CIImage *ciImage = [CIImage imageWithCVPixelBuffer:imageBuffer];
-
-    vc.glView.currentFrame = imageBuffer;
-       dispatch_async(dispatch_get_main_queue(), ^{
-    [vc.glView setNeedsDisplay:YES];
-       });
-
-////    CIContext *ciContext = [CIContext contextWithOptions:nil];
-////    CGFloat width = CVPixelBufferGetWidth(imageBuffer);
-////    CGFloat height = CVPixelBufferGetHeight(imageBuffer);
-////    CGImageRef cgImage = [ciContext
-////                          createCGImage:ciImage
-////                          fromRect:CGRectMake(0, 0, width, height)];
-////
-////    NSImage *image = [[NSImage alloc] initWithCGImage:cgImage
-////                                                 size:NSMakeSize(width, height)];
-//
-//    dispatch_async(dispatch_get_main_queue(), ^{
-////        vc.imageView.image = image;
-////
-////        CGImageRelease(cgImage);
-////        NSData* imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:sampleBuffer];
-////        NSImage* frameImage = [NSImage imageWithData:imageData];
-//                CGLContextObj glContext = vc.glView.openGLContext.CGLContextObj;
-//                CIContext *ciContext = [CIContext contextWithCGLContext:glContext
-//                                                            pixelFormat:vc.glView.openGLContext.pixelFormat.CGLPixelFormatObj
-//                                                             colorSpace:CGColorSpaceCreateDeviceRGB()
-//                                                                options:nil];
-//                [ciContext drawImage:ciImage
-//                              inRect:vc.glView.frame
-//                            fromRect:ciImage.extent];
-//        [vc.glView update];
-////        [vc.glView setNeedsDisplay:YES];
-//    });
-//
-//    //    CGImageRelease(ciImage);
+    vc.glView.imageBuffer = imageBuffer;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [vc.glView setNeedsDisplay:YES];
+    });
 }
 

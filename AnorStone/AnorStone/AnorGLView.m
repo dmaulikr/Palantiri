@@ -16,7 +16,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
 
-    _lock = [NSLock new];
+    _lock = [NSRecursiveLock new];
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
@@ -56,10 +56,6 @@
     glClearColor(0.0, 1.0, 0.5, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
     
-    //    if(!_currentFrame) {
-    //        [self updateCurrentFrame];
-    //    }
-    
     [self renderCurrentFrame];
     
     glFlush();
@@ -71,9 +67,9 @@
 - (void)renderCurrentFrame {
     
     NSRect frame = [self frame];
-    
-    if(_currentFrame) {
-        CIImage* inputImage = [CIImage imageWithCVImageBuffer:_currentFrame];
+
+    if(_imageBuffer) {
+        CIImage* inputImage = [CIImage imageWithCVImageBuffer:_imageBuffer];
         CGRect imageRect = [inputImage extent];
         [_ciContext drawImage:inputImage
                       atPoint:CGPointMake((int)((frame.size.width - imageRect.size.width) * 0.5),
@@ -82,15 +78,15 @@
     }
 }
 
-- (void)setCurrentFrame:(CVImageBufferRef)currentFrame {
+- (void)setImageBuffer:(CVImageBufferRef)imageBuffer {
     [_lock lock];
-    if(_currentFrame) {
-        CFRelease(_currentFrame);
-        _currentFrame = nil;
+    if(_imageBuffer) {
+        CFRelease(_imageBuffer);
+        _imageBuffer = nil;
     }
     
-    if(currentFrame) {
-        _currentFrame = CFRetain(currentFrame);
+    if(imageBuffer) {
+        _imageBuffer = CFRetain(imageBuffer);
     }
     [_lock unlock];
 }

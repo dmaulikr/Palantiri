@@ -14,19 +14,10 @@
     
 @private
     NSRecursiveLock* _lock;
-    
-    //    NSDictionary* _fontAttributes;
-    
-    int _frameCount;
-    int _frameRate;
-    CVTimeStamp _frameCountTimeStamp;
-    double _timebaseRatio;
 
-    //    id _delegate;
-    
 }
 
-@property (nonatomic, assign) CVImageBufferRef currentFrame;
+@property (nonatomic, assign) CVImageBufferRef imageBuffer;
 @property (nonatomic, retain) CIContext* ciContext;
 @property (nonatomic, assign) BOOL needsReshape;
 
