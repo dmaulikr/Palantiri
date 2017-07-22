@@ -59,13 +59,13 @@
 			children = (
 				5BD4A3961F1EA0CF002D60A1 /* AppDelegate.h */,
 				5BD4A3971F1EA0CF002D60A1 /* AppDelegate.m */,
+				5BD4A39C1F1EA0CF002D60A1 /* Assets.xcassets */,
+				5BD4A3A11F1EA0CF002D60A1 /* Info.plist */,
+				5BD4A3A41F1EA0CF002D60A1 /* IthilStone.entitlements */,
 				5BD4A3991F1EA0CF002D60A1 /* IthilViewController.h */,
 				5BD4A39A1F1EA0CF002D60A1 /* IthilViewController.m */,
-				5BD4A39C1F1EA0CF002D60A1 /* Assets.xcassets */,
-				5BD4A39E1F1EA0CF002D60A1 /* Main.storyboard */,
-				5BD4A3A11F1EA0CF002D60A1 /* Info.plist */,
 				5BD4A3A21F1EA0CF002D60A1 /* main.m */,
-				5BD4A3A41F1EA0CF002D60A1 /* IthilStone.entitlements */,
+				5BD4A39E1F1EA0CF002D60A1 /* Main.storyboard */,
 			);
 			path = IthilStone;
 			sourceTree = "<group>";

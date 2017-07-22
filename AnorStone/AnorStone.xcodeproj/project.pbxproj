@@ -12,6 +12,7 @@
 		5BD4A37D1F1EA093002D60A1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5BD4A37C1F1EA093002D60A1 /* Assets.xcassets */; };
 		5BD4A3801F1EA093002D60A1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5BD4A37E1F1EA093002D60A1 /* Main.storyboard */; };
 		5BD4A3831F1EA093002D60A1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BD4A3821F1EA093002D60A1 /* main.m */; };
+		5BEC9E511F22C70100A1C252 /* AnorGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BEC9E501F22C70100A1C252 /* AnorGLView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +26,8 @@
 		5BD4A3811F1EA093002D60A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5BD4A3821F1EA093002D60A1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		5BD4A3841F1EA093002D60A1 /* AnorStone.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AnorStone.entitlements; sourceTree = "<group>"; };
+		5BEC9E4F1F22C70100A1C252 /* AnorGLView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnorGLView.h; sourceTree = "<group>"; };
+		5BEC9E501F22C70100A1C252 /* AnorGLView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnorGLView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,15 +60,17 @@
 		5BD4A3751F1EA093002D60A1 /* AnorStone */ = {
 			isa = PBXGroup;
 			children = (
-				5BD4A3761F1EA093002D60A1 /* AppDelegate.h */,
-				5BD4A3771F1EA093002D60A1 /* AppDelegate.m */,
+				5BEC9E4F1F22C70100A1C252 /* AnorGLView.h */,
+				5BEC9E501F22C70100A1C252 /* AnorGLView.m */,
+				5BD4A3841F1EA093002D60A1 /* AnorStone.entitlements */,
 				5BD4A3791F1EA093002D60A1 /* AnorViewController.h */,
 				5BD4A37A1F1EA093002D60A1 /* AnorViewController.m */,
+				5BD4A3761F1EA093002D60A1 /* AppDelegate.h */,
+				5BD4A3771F1EA093002D60A1 /* AppDelegate.m */,
 				5BD4A37C1F1EA093002D60A1 /* Assets.xcassets */,
-				5BD4A37E1F1EA093002D60A1 /* Main.storyboard */,
 				5BD4A3811F1EA093002D60A1 /* Info.plist */,
 				5BD4A3821F1EA093002D60A1 /* main.m */,
-				5BD4A3841F1EA093002D60A1 /* AnorStone.entitlements */,
+				5BD4A37E1F1EA093002D60A1 /* Main.storyboard */,
 			);
 			path = AnorStone;
 			sourceTree = "<group>";
@@ -145,6 +150,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5BD4A37B1F1EA093002D60A1 /* AnorViewController.m in Sources */,
+				5BEC9E511F22C70100A1C252 /* AnorGLView.m in Sources */,
 				5BD4A3831F1EA093002D60A1 /* main.m in Sources */,
 				5BD4A3781F1EA093002D60A1 /* AppDelegate.m in Sources */,
 			);

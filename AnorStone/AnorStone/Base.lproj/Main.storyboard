@@ -708,7 +708,21 @@
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
                         <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <openGLView wantsLayer="YES" useAuxiliaryDepthBufferStencil="NO" allowOffline="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uoP-ma-seI" customClass="AnorGLView">
+                                <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                            </openGLView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="uoP-ma-seI" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="MDp-TZ-Wle"/>
+                            <constraint firstAttribute="bottom" secondItem="uoP-ma-seI" secondAttribute="bottom" id="Sva-ne-O0K"/>
+                            <constraint firstItem="uoP-ma-seI" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="bi1-u3-PpD"/>
+                            <constraint firstAttribute="trailing" secondItem="uoP-ma-seI" secondAttribute="trailing" id="dlv-wg-6fv"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="glView" destination="uoP-ma-seI" id="Oer-uf-gzp"/>
+                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>

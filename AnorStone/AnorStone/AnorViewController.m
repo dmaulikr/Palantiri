@@ -16,13 +16,13 @@
 static NSInteger BUFFER_SIZE = 1024;
 
 
-//void decodeFrame(void *decompressionOutputRefCon,
-//                 void *sourceFrameRefCon,
-//                 OSStatus status,
-//                 VTDecodeInfoFlags infoFlags,
-//                 CVImageBufferRef imageBuffer,
-//                 CMTime presentationTimeStamp,
-//                 CMTime presentationDuration);
+void decodeFrame(void *decompressionOutputRefCon,
+                 void *sourceFrameRefCon,
+                 OSStatus status,
+                 VTDecodeInfoFlags infoFlags,
+                 CVImageBufferRef imageBuffer,
+                 CMTime presentationTimeStamp,
+                 CMTime presentationDuration);
 
 @implementation AnorViewController {
     
@@ -32,7 +32,7 @@ static NSInteger BUFFER_SIZE = 1024;
     NSInputStream* _inputStream;
     NSOutputStream* _outputStream;
 
-//    VTDecompressionSessionRef _session;
+    VTDecompressionSessionRef _session;
     CMVideoFormatDescriptionRef _formatDesc;
     int _spsSize;
     int _ppsSize;
@@ -44,26 +44,38 @@ static NSInteger BUFFER_SIZE = 1024;
 
     _data = [NSMutableData new];
 
-        self.videoLayer = [[AVSampleBufferDisplayLayer alloc] init];
-        self.videoLayer.frame = self.view.bounds;
-        self.videoLayer.position = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds));
-        self.videoLayer.videoGravity = AVLayerVideoGravityResizeAspect;
-        self.videoLayer.backgroundColor = [[NSColor greenColor] CGColor];
-
-        CMTimebaseRef controlTimebase;
-        CMTimebaseCreateWithMasterClock(CFAllocatorGetDefault(), CMClockGetHostTimeClock(), &controlTimebase);
-
-        self.videoLayer.controlTimebase = controlTimebase;
-        CMTimebaseSetTime(self.videoLayer.controlTimebase, CMTimeMake(5, 1));
-        CMTimebaseSetRate(self.videoLayer.controlTimebase, 1.0);
-
-        // connect the video layer with the view
-        [self.view.layer addSublayer:_videoLayer];
+//        self.videoLayer = [[AVSampleBufferDisplayLayer alloc] init];
+//        self.videoLayer.frame = self.view.bounds;
+//        self.videoLayer.position = CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds));
+//        self.videoLayer.videoGravity = AVLayerVideoGravityResizeAspect;
+//        self.videoLayer.backgroundColor = [[NSColor greenColor] CGColor];
+//
+//        CMTimebaseRef controlTimebase;
+//        CMTimebaseCreateWithMasterClock(CFAllocatorGetDefault(), CMClockGetHostTimeClock(), &controlTimebase);
+//
+//        self.videoLayer.controlTimebase = controlTimebase;
+//        CMTimebaseSetTime(self.videoLayer.controlTimebase, CMTimeMake(5, 1));
+//        CMTimebaseSetRate(self.videoLayer.controlTimebase, 1.0);
+//
+//        // connect the video layer with the view
+//        [self.view.layer addSublayer:_videoLayer];
 
     //    self.glView.layer.backgroundColor = [NSColor greenColor].CGColor;
 
 //    [self.glView prepareOpenGL];
 //    [self.glView clearGLContext];
+
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+
+    /* Create CIContext */
+    _glView.ciContext = [CIContext contextWithCGLContext:_glView.openGLContext.CGLContextObj
+                                      pixelFormat:_glView.pixelFormat.CGLPixelFormatObj
+                                                 options:@{
+                                                           kCIContextOutputColorSpace : (__bridge id)colorSpace,
+                                                           kCIContextWorkingColorSpace : (__bridge id)colorSpace,
+                                                           }];
+    _glView.needsReshape = YES;
+    CGColorSpaceRelease(colorSpace);
 
     [self setupListener];
 }
@@ -71,7 +83,9 @@ static NSInteger BUFFER_SIZE = 1024;
 - (void)viewDidLayout {
     [super viewDidLayout];
 
-        self.videoLayer.frame = self.view.bounds;
+//        self.videoLayer.frame = self.view.bounds;
+    _glView.needsReshape = YES;
+    [_glView setNeedsDisplay:YES];
 }
 
 - (void)setupListener {
@@ -87,25 +101,25 @@ static NSInteger BUFFER_SIZE = 1024;
                                   NSNetServiceListenForConnections)];
 }
 
-//- (void)setupDecodingSession {
-//
-//    // setup decoding session
-//    VTDecompressionOutputCallbackRecord callBackRecord;
-//    callBackRecord.decompressionOutputCallback = decodeFrame;
-//    callBackRecord.decompressionOutputRefCon = (__bridge void *)self;
-//
-//    CFDictionaryRef bufferAttrs = CFBridgingRetain(@{
-//                                                 (id)kCVPixelBufferOpenGLCompatibilityKey : (id)kCFBooleanTrue,
-//                                                 (id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA),
-//                                                     });
-//    OSStatus err = VTDecompressionSessionCreate(kCFAllocatorDefault,
-//                                                _formatDesc,
-//                                                NULL,
-//                                                bufferAttrs,
-//                                                &callBackRecord,
-//                                                &_session);
-//    //    NSLog(@"%@: err=%ld", NSStringFromSelector(_cmd), (long)err);
-//}
+- (void)setupDecodingSession {
+
+    // setup decoding session
+    VTDecompressionOutputCallbackRecord callBackRecord;
+    callBackRecord.decompressionOutputCallback = decodeFrame;
+    callBackRecord.decompressionOutputRefCon = (__bridge void *)self;
+
+    CFDictionaryRef bufferAttrs = CFBridgingRetain(@{
+                                                 (id)kCVPixelBufferOpenGLCompatibilityKey : (id)kCFBooleanTrue,
+                                                 (id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA),
+                                                     });
+    OSStatus err = VTDecompressionSessionCreate(kCFAllocatorDefault,
+                                                _formatDesc,
+                                                NULL,
+                                                bufferAttrs,
+                                                &callBackRecord,
+                                                &_session);
+    //    NSLog(@"%@: err=%ld", NSStringFromSelector(_cmd), (long)err);
+}
 
 - (int)findStartCodeInData:(NSData*)data startingFromOffset:(int)offset {
 
@@ -198,8 +212,7 @@ static NSInteger BUFFER_SIZE = 1024;
 
 - (void)processFrame:(NSData*)frameData
              spsData:(NSData*)spsData
-             ppsData:(NSData*)ppsData
-{
+             ppsData:(NSData*)ppsData {
 
     uint8_t* frame = [frameData bytes];
 
@@ -228,9 +241,9 @@ static NSInteger BUFFER_SIZE = 1024;
 
     CMBlockBufferRef blockBuffer = NULL;
 
-//    if(_session == NULL) {
-//        [self setupDecodingSession];
-//    }
+    if(_session == NULL) {
+        [self setupDecodingSession];
+    }
 
     // create a block buffer from the IDR NALU
     OSStatus status = CMBlockBufferCreateWithMemoryBlock(kCFAllocatorDefault,
@@ -268,20 +281,20 @@ static NSInteger BUFFER_SIZE = 1024;
 
 - (void)renderFrame:(CMSampleBufferRef)buffer {
 
-//    VTDecodeFrameFlags frameFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
-//    VTDecodeInfoFlags decodeFlags = 0;
-//    NSDate* now = [NSDate date];
-//    OSStatus err = VTDecompressionSessionDecodeFrame(_session,
-//                                                     buffer,
-//                                                     frameFlags,
-//                                                     (void*)CFBridgingRetain(now),
-//                                                     &decodeFlags);
-    //    NSLog(@"err=%ld", (long)err);
+    VTDecodeFrameFlags frameFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
+    VTDecodeInfoFlags decodeFlags = 0;
+    NSDate* now = [NSDate date];
+    OSStatus err = VTDecompressionSessionDecodeFrame(_session,
+                                                     buffer,
+                                                     frameFlags,
+                                                     (void*)CFBridgingRetain(now),
+                                                     &decodeFlags);
+//        NSLog(@"err=%ld", (long)err);
 
-    // put it on the screen
-    if ([_videoLayer isReadyForMoreMediaData]) {
-        [_videoLayer enqueueSampleBuffer:buffer];
-    }
+//    // put it on the screen
+//    if ([_videoLayer isReadyForMoreMediaData]) {
+//        [_videoLayer enqueueSampleBuffer:buffer];
+//    }
 }
 
 - (void)netServiceDidStop:(NSNetService *)sender {
@@ -322,7 +335,7 @@ static NSInteger BUFFER_SIZE = 1024;
 - (void)netService:(NSNetService *)sender didAcceptConnectionWithInputStream:(NSInputStream *)inputStream outputStream:(NSOutputStream *)outputStream {
     NSLog(@"%@: %@", NSStringFromSelector(_cmd), sender);
 
-//    [self setupDecodingSession];
+    [self setupDecodingSession];
 
     _inputStream = inputStream;
     _inputStream.delegate = self;
@@ -401,14 +414,19 @@ static NSInteger BUFFER_SIZE = 1024;
 
 @end
 
-//void decodeFrame(void *decompressionOutputRefCon, void *sourceFrameRefCon, OSStatus status, VTDecodeInfoFlags infoFlags, CVImageBufferRef imageBuffer, CMTime presentationTimeStamp, CMTime presentationDuration) {
-//
-//    if(infoFlags & kVTDecodeInfo_FrameDropped) return;
-//
-//    AnorViewController* vc = (__bridge AnorViewController*)decompressionOutputRefCon;
-//
+void decodeFrame(void *decompressionOutputRefCon, void *sourceFrameRefCon, OSStatus status, VTDecodeInfoFlags infoFlags, CVImageBufferRef imageBuffer, CMTime presentationTimeStamp, CMTime presentationDuration) {
+
+    if(infoFlags & kVTDecodeInfo_FrameDropped) return;
+
+    AnorViewController* vc = (__bridge AnorViewController*)decompressionOutputRefCon;
+
 //    CIImage *ciImage = [CIImage imageWithCVPixelBuffer:imageBuffer];
-//
+
+    vc.glView.currentFrame = imageBuffer;
+       dispatch_async(dispatch_get_main_queue(), ^{
+    [vc.glView setNeedsDisplay:YES];
+       });
+
 ////    CIContext *ciContext = [CIContext contextWithOptions:nil];
 ////    CGFloat width = CVPixelBufferGetWidth(imageBuffer);
 ////    CGFloat height = CVPixelBufferGetHeight(imageBuffer);
@@ -438,5 +456,5 @@ static NSInteger BUFFER_SIZE = 1024;
 //    });
 //
 //    //    CGImageRelease(ciImage);
-//}
+}
 
