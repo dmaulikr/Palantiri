@@ -73,9 +73,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5BD4A3921F1EA0CF002D60A1 /* IthilStone */ = {
+		5BD4A3921F1EA0CF002D60A1 /* Capturer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5BD4A3A71F1EA0CF002D60A1 /* Build configuration list for PBXNativeTarget "IthilStone" */;
+			buildConfigurationList = 5BD4A3A71F1EA0CF002D60A1 /* Build configuration list for PBXNativeTarget "Capturer" */;
 			buildPhases = (
 				5BD4A38F1F1EA0CF002D60A1 /* Sources */,
 				5BD4A3901F1EA0CF002D60A1 /* Frameworks */,
@@ -85,7 +85,7 @@
 			);
 			dependencies = (
 			);
-			name = IthilStone;
+			name = Capturer;
 			productName = IthilStone;
 			productReference = 5BD4A3931F1EA0CF002D60A1 /* Capturer.app */;
 			productType = "com.apple.product-type.application";
@@ -109,7 +109,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 5BD4A38E1F1EA0CF002D60A1 /* Build configuration list for PBXProject "IthilStone" */;
+			buildConfigurationList = 5BD4A38E1F1EA0CF002D60A1 /* Build configuration list for PBXProject "Capturer" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -122,7 +122,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5BD4A3921F1EA0CF002D60A1 /* IthilStone */,
+				5BD4A3921F1EA0CF002D60A1 /* Capturer */,
 			);
 		};
 /* End PBXProject section */
@@ -296,7 +296,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5BD4A38E1F1EA0CF002D60A1 /* Build configuration list for PBXProject "IthilStone" */ = {
+		5BD4A38E1F1EA0CF002D60A1 /* Build configuration list for PBXProject "Capturer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5BD4A3A51F1EA0CF002D60A1 /* Debug */,
@@ -305,7 +305,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5BD4A3A71F1EA0CF002D60A1 /* Build configuration list for PBXNativeTarget "IthilStone" */ = {
+		5BD4A3A71F1EA0CF002D60A1 /* Build configuration list for PBXNativeTarget "Capturer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5BD4A3A81F1EA0CF002D60A1 /* Debug */,

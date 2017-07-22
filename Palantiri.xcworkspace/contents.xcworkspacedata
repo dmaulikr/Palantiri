@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:IthilStone/IthilStone.xcodeproj">
+      location = "group:/Volumes/Projects/Misc/Duet/Palantiri/IthilStone/Capturer.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:AnorStone/AnorStone.xcodeproj">
+      location = "group:/Volumes/Projects/Misc/Duet/Palantiri/AnorStone/Viewer.xcodeproj">
    </FileRef>
 </Workspace>

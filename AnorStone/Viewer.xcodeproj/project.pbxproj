@@ -78,9 +78,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		5BD4A3721F1EA093002D60A1 /* AnorStone */ = {
+		5BD4A3721F1EA093002D60A1 /* Viewer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 5BD4A3871F1EA093002D60A1 /* Build configuration list for PBXNativeTarget "AnorStone" */;
+			buildConfigurationList = 5BD4A3871F1EA093002D60A1 /* Build configuration list for PBXNativeTarget "Viewer" */;
 			buildPhases = (
 				5BD4A36F1F1EA093002D60A1 /* Sources */,
 				5BD4A3701F1EA093002D60A1 /* Frameworks */,
@@ -90,7 +90,7 @@
 			);
 			dependencies = (
 			);
-			name = AnorStone;
+			name = Viewer;
 			productName = AnorStone;
 			productReference = 5BD4A3731F1EA093002D60A1 /* Viewer.app */;
 			productType = "com.apple.product-type.application";
@@ -114,7 +114,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 5BD4A36E1F1EA093002D60A1 /* Build configuration list for PBXProject "AnorStone" */;
+			buildConfigurationList = 5BD4A36E1F1EA093002D60A1 /* Build configuration list for PBXProject "Viewer" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -127,7 +127,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5BD4A3721F1EA093002D60A1 /* AnorStone */,
+				5BD4A3721F1EA093002D60A1 /* Viewer */,
 			);
 		};
 /* End PBXProject section */
@@ -304,7 +304,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5BD4A36E1F1EA093002D60A1 /* Build configuration list for PBXProject "AnorStone" */ = {
+		5BD4A36E1F1EA093002D60A1 /* Build configuration list for PBXProject "Viewer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5BD4A3851F1EA093002D60A1 /* Debug */,
@@ -313,7 +313,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5BD4A3871F1EA093002D60A1 /* Build configuration list for PBXNativeTarget "AnorStone" */ = {
+		5BD4A3871F1EA093002D60A1 /* Build configuration list for PBXNativeTarget "Viewer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				5BD4A3881F1EA093002D60A1 /* Debug */,
