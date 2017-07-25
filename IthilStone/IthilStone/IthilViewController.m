@@ -290,6 +290,8 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
         return;
     }
 
+    if(status != 0 || infoFlags & kVTEncodeInfo_FrameDropped) return;
+
     // send the buffer
     IthilViewController* vc = (__bridge IthilViewController*)outputCallbackRefCon;
     [vc sendBuffer:sampleBuffer];
