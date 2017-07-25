@@ -188,13 +188,13 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
             NSLog(@"Error while writing stream: %@", [_outputStream streamError]);
             break;
 
-        case 0:
-            //            NSLog(@"Nothing sent.");
-            break;
-
-        default:
-            //            NSLog(@"%ld bytes sent.", length);
-            break;
+//        case 0:
+//            //            NSLog(@"Nothing sent.");
+//            break;
+//
+//        default:
+//            //            NSLog(@"%ld bytes sent.", length);
+//            break;
     }
 }
 
