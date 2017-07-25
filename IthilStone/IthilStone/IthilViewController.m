@@ -89,6 +89,7 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
                                                                                        frameSurface,
                                                                                        NULL,
                                                                                        &pixelBuffer);
+                                        CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
                                         //                                        NSLog(@"CGDisplayStreamCreate[callback]: rc=%ld, pixelBuffer=%p", (long)rc, pixelBuffer);
                                         CMTime time = CMTimeMake(displayTime, 1);
                                         OSStatus err = VTCompressionSessionEncodeFrame(_session,
@@ -98,6 +99,7 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
                                                                                        frameProperties,
                                                                                        (__bridge void*)self,
                                                                                        &flags);
+                                        CVPixelBufferUnlockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
                                         CVPixelBufferRelease(pixelBuffer);
                                         CFRelease(frameProperties);
                                         //                                        NSLog(@"CGDisplayStreamCreate[callback]: err=%ld", (long)err);
