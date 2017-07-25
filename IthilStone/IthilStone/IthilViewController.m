@@ -78,6 +78,8 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
                                     streamProperties,
                                     ^(CGDisplayStreamFrameStatus status, uint64_t displayTime, IOSurfaceRef frameSurface, CGDisplayStreamUpdateRef updateRef) {
                                         //                                        NSLog(@"CGDisplayStreamCreate[callback]: status=%ld, displayTime=%ld, frameSurface=%@, updateRef=%@", (long)status, (long)displayTime, frameSurface, updateRef);
+                                        if(status != kCGDisplayStreamFrameStatusFrameComplete) return;
+                                        
                                         VTEncodeInfoFlags flags = 0;
                                         CFDictionaryRef frameProperties = CFBridgingRetain(@{
                                                                                              (id)kVTCompressionPropertyKey_RealTime : @YES,
