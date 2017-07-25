@@ -98,7 +98,6 @@ void handleSample(void *outputCallbackRefCon, void *sourceFrameRefCon, OSStatus 
                                                                                        frameProperties,
                                                                                        (__bridge void*)self,
                                                                                        &flags);
-                                        //                                        VTCompressionSessionEndPass(_session, NULL, NULL);
                                         CVPixelBufferRelease(pixelBuffer);
                                         CFRelease(frameProperties);
                                         //                                        NSLog(@"CGDisplayStreamCreate[callback]: err=%ld", (long)err);
