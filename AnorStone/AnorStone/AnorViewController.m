@@ -259,7 +259,7 @@ void decodeFrame(void *decompressionOutputRefCon,
 
 - (void)renderFrame:(CMSampleBufferRef)buffer {
 
-    VTDecodeFrameFlags frameFlags = kVTDecodeFrame_EnableAsynchronousDecompression;
+    VTDecodeFrameFlags frameFlags = kVTDecodeFrame_EnableAsynchronousDecompression & kVTDecodeFrame_1xRealTimePlayback;
     VTDecodeInfoFlags decodeFlags = 0;
     NSDate* now = [NSDate date];
     OSStatus err = VTDecompressionSessionDecodeFrame(_session,
